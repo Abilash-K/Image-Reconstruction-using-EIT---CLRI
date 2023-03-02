@@ -82,18 +82,18 @@ def bottomleft_electrode(pointX,pointY):
 #   348,351    BR
 bottomright_electrode_X = 314
 bottomright_electrode_Y = 357
-def bottomright_electrode(pointX,pointY):
+bre_ray = 330
+def bottomright_electrode(pointX,pointY,ray):
     x = pointX
     y = pointY
     y1 = pointY - 500
-    line_pt = 330
     canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
     # canvas.create_line(line_pt, y+13, x - 500, y -500)
     # canvas.create_line(line_pt, y+13, x - 500, y -550)
     # canvas.create_line(line_pt, y+13, x - 500, y -600)
     # canvas.create_line(line_pt, y+13, x - 500, y -650)
     for i in range(4):
-        canvas.create_line(line_pt, y+13, x-500,y1)
+        canvas.create_line(ray, y+13, x-500,y1)
         y1 -= 50
 
 testline=[(330,370),(-170,-143)]
@@ -103,17 +103,30 @@ def export_csv():
     # creating polygons using Polygon()
     poly1 = Polygon(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13)
 
+    #BOTTOM_RIGHT_ELECTRODE
+    BOTTOM_RIGHT_ELECTRODE = []
+    bre_Y1 = bottomright_electrode_Y - 500
+    BRE_Y0 = bottomright_electrode_Y + 13
+    for i in range(4):
+        p14 , p15 = map(Point,[(bre_ray,BRE_Y0),(-186,bre_Y1)])
+        bre_Y1 -= 50
+        poly2 = Line(p14,p15)
+        isIntersection = poly1.intersection(poly2)
+        point1 = isIntersection[0].evalf()
+        point2= isIntersection[1].evalf()
+        final_distance = math.dist(point1,point2)
+        BOTTOM_RIGHT_ELECTRODE.extend([(point1,point2,final_distance)])
+    print(BOTTOM_RIGHT_ELECTRODE)
+    # p14, p15 = map(Point, testline)
+    # poly2 = Line(p14, p15)
 
-    p14, p15 = map(Point, testline,)
-    poly2 = Line(p14, p15)
-
-    isIntersection = poly1.intersection(poly2)
-    point1 = isIntersection[0]
-    point2= isIntersection[1]
-    # segmentof = Segment(pointX,pointY)
-    # lengthof=segmentof.length
-    print(math.dist(point1,point2))
-    # print(pointX,pointY)
+    # isIntersection = poly1.intersection(poly2)
+    # point1 = isIntersection[0]
+    # point2= isIntersection[1]
+    # # segmentof = Segment(pointX,pointY)
+    # # lengthof=segmentof.length
+    # print(math.dist(point1,point2))
+    # # print(pointX,pointY)
 
 
 
@@ -122,13 +135,13 @@ turn_on.place(x = 512 , y = 212)
 
 #186.97
 # Testing purpose!
-canvas.create_line([(164.57,200.26),(201.30,237.96)], fill='red', width=2)
+# canvas.create_line([(164.57,200.26),(201.30,237.96)], fill='red', width=2)
 
 
 topleft_electrode(topleft_electrode_X,topleft_electrode_Y)
 topright_electrode(topright_electrode_X,topleft_electrode_Y)
 bottomleft_electrode(bottomleft_electrode_X,bottomleft_electrode_Y)
-bottomright_electrode(bottomright_electrode_X,bottomright_electrode_Y)
+bottomright_electrode(bottomright_electrode_X,bottomright_electrode_Y,bre_ray)
 
 
 window.mainloop()
