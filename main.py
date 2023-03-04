@@ -3,6 +3,7 @@ from sympy import Point, Polygon, Line
 import math
 
 
+
 window = Tk()
 
 window.geometry("600x400")
@@ -12,24 +13,39 @@ canvas = Canvas(width=400, height=400)
 
 canvas.pack()
 
-canvas.create_oval(0, 0, 400, 400, fill="purple")
+circle_X = 210
+cirxle_Y= 148
+radius = 120
 
+canvas.create_oval(circle_X-radius,cirxle_Y-radius,circle_X+radius,cirxle_Y+radius, fill="purple")
+canvas.place(relx=0.45, rely=0.65, anchor=CENTER)
 polygon_points = [[224.2356,196.2049],[222.2607,211.2406],[215.6908,226.3429],[203.1994,237.7227],[189.7210,239.4222],[176.7850,231.9500],[168.8122,219.7678],[164.5375,203.4922],[164.7001,187.6920],[168.3534,173.7151],[176.4413,160.6113],[186.5356,153.4606],[195.4196,151.9446]]
 canvas.create_polygon(polygon_points, outline='gray',
                       fill='gray', width=2)
 
 
-
 # This function gets the coordinates of the mouse pointert and helps to place the electrode
-# def motion(event):
-#     x, y = event.x, event.y
-#     print('{}, {}'.format(x, y))
-# window.bind('<Motion>', motion)
+def motion(event):
+    x, y = event.x, event.y
+    print('{}, {}'.format(x, y))
+window.bind('<Motion>', motion)
 
+
+top_electrode_X = 203
+top_electrode_Y = 23
+def top_electrode(pointX,pointY):
+    x = pointX
+    y = pointY
+    y1 = pointY + 500
+    canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
+    for i in range(4):
+        canvas.create_line(x,y,x+500,y1)
+        y1 += 50
 
 # 52,72 TL
-topleft_electrode_X = 29
-topleft_electrode_Y = 80
+topleft_electrode_X = 203
+topleft_electrode_Y = 262
+
 def topleft_electrode(pointX,pointY):
     x = pointX
     y = pointY
@@ -100,7 +116,7 @@ def bottomright_electrode(pointX,pointY,ray):
 testline=[(330,370),(-170,-143)]
 def export_csv():
     # creating points using Point()
-    p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 = map(Point, polygon_points,)
+    p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 = map(Point, polygon_points)
     # creating polygons using Polygon()
     poly1 = Polygon(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13)
 
@@ -185,6 +201,7 @@ turn_on.place(x = 512 , y = 212)
 # Testing purpose!
 # canvas.create_line([(164.57,200.26),(201.30,237.96)], fill='red', width=2)
 
+top_electrode(top_electrode_X,top_electrode_Y)
 
 topleft_electrode(topleft_electrode_X,topleft_electrode_Y)
 topright_electrode(topright_electrode_X,topleft_electrode_Y,tre_ray)
