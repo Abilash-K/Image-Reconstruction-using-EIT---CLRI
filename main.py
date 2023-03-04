@@ -1,5 +1,5 @@
 from tkinter import *
-from sympy import Point, Polygon, Line, Segment
+from sympy import Point, Polygon, Line
 import math
 
 
@@ -46,36 +46,37 @@ def topleft_electrode(pointX,pointY):
 #  366,89     TR
 topright_electrode_X = 355
 topright_electrode_Y = 80
-def topright_electrode(pointX,pointY):
+tre_ray = 370
+def topright_electrode(pointX,pointY,ray):
     x = pointX
     y = pointY
     y1 = pointY + 200
-    line_pt = 370
+
     canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
     # canvas.create_line(line_pt, y, x - 500, y +200)
     # canvas.create_line(line_pt, y, x - 500, y +250)
     # canvas.create_line(line_pt, y, x - 500, y +300)
     # canvas.create_line(line_pt, y, x - 500, y +350)
     for i in range(4):
-        canvas.create_line(line_pt,y,x-500,y1)
+        canvas.create_line(ray,y,x-500,y1)
         y1 += 50
 
 
 #   35,315    BL
 bottomleft_electrode_X = 73
 bottomleft_electrode_Y = 357
-def bottomleft_electrode(pointX,pointY):
+ble_ray = 74
+def bottomleft_electrode(pointX,pointY,ray):
     x = pointX
     y = pointY
     y1 = pointY - 500
-    line_pt = 74
     canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
     # canvas.create_line(line_pt, y+10, x + 500, y - 500)
     # canvas.create_line(line_pt, y+10, x + 500, y - 550)
     # canvas.create_line(line_pt, y+10, x + 500, y - 600)
     # canvas.create_line(line_pt, y+10, x + 500, y - 650)
     for i in range(4):
-        canvas.create_line(line_pt,y+10,x+500,y1)
+        canvas.create_line(ray,y+10,x+500,y1)
         y1 -= 50
 
 
@@ -117,6 +118,53 @@ def export_csv():
         final_distance = math.dist(point1,point2)
         BOTTOM_RIGHT_ELECTRODE.extend([(point1,point2,final_distance)])
     print(BOTTOM_RIGHT_ELECTRODE)
+
+    #BOTTOM_LEFT_ELECTRODE
+    BOTTOM_LEFT_ELECTRODE = []
+    ble_Y1 = bottomleft_electrode_Y - 500
+    BLE_Y0 = bottomright_electrode_Y + 10
+    for i in range(4):
+        p14 , p15 = map(Point,[(ble_ray,BLE_Y0),(573,ble_Y1)])
+        bre_Y1 -= 50
+        poly2 = Line(p14,p15)
+        isIntersection = poly1.intersection(poly2)
+
+        point1 = isIntersection[0].evalf()
+        point2= isIntersection[1].evalf()
+        final_distance = math.dist(point1,point2)
+        BOTTOM_LEFT_ELECTRODE.extend([(point1,point2,final_distance)])
+    print(BOTTOM_LEFT_ELECTRODE)
+
+    # TOP_RIGHT_ELECTRODE
+    TOP_RIGHT_ELECTRODE = []
+    TRe_Y1 = topright_electrode_Y + 200
+    for i in range(4):
+        p14, p15 = map(Point, [(tre_ray, topright_electrode_Y), (-145, TRe_Y1)])
+        TRe_Y1 += 50
+        poly2 = Line(p14, p15)
+        isIntersection = poly1.intersection(poly2)
+        if (isIntersection):
+            point1 = isIntersection[0].evalf()
+            point2 = isIntersection[1].evalf()
+            final_distance = math.dist(point1, point2)
+            TOP_RIGHT_ELECTRODE.extend([(point1, point2, final_distance)])
+    print(TOP_RIGHT_ELECTRODE)
+
+    # TOP_LEFT_ELECTRODE
+    TOP_LEFT_ELECTRODE = []
+    Tle_Y1 = topleft_electrode_Y + 500
+    for i in range(4):
+        p14, p15 = map(Point, [(topleft_electrode_X, topleft_electrode_Y), (529, Tle_Y1)])
+        Tle_Y1 += 50
+        poly2 = Line(p14, p15)
+        isIntersection = poly1.intersection(poly2)
+        if (isIntersection):
+            point1 = isIntersection[0].evalf()
+            point2 = isIntersection[1].evalf()
+            final_distance = math.dist(point1, point2)
+            TOP_LEFT_ELECTRODE.extend([(point1, point2, final_distance)])
+    print(TOP_LEFT_ELECTRODE)
+
     # p14, p15 = map(Point, testline)
     # poly2 = Line(p14, p15)
 
@@ -139,8 +187,8 @@ turn_on.place(x = 512 , y = 212)
 
 
 topleft_electrode(topleft_electrode_X,topleft_electrode_Y)
-topright_electrode(topright_electrode_X,topleft_electrode_Y)
-bottomleft_electrode(bottomleft_electrode_X,bottomleft_electrode_Y)
+topright_electrode(topright_electrode_X,topleft_electrode_Y,tre_ray)
+bottomleft_electrode(bottomleft_electrode_X,bottomleft_electrode_Y,ble_ray)
 bottomright_electrode(bottomright_electrode_X,bottomright_electrode_Y,bre_ray)
 
 
