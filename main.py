@@ -38,9 +38,12 @@ def electrode_val(selection):
     electrode = default_val.get()
     electrode = int(electrode)
     creating_electrodes()
+    canvas.delete('line')
+    electrodes()
 
 def creating_electrodes():
     # Divide the oval into sections
+    global coords
     x0, y0, x1, y1 = circle_X - radius, cirxle_Y - radius, circle_X + radius, cirxle_Y + radius
     coords = []
     for i in range(electrode):
@@ -48,96 +51,103 @@ def creating_electrodes():
         x = (x0 + x1) / 2 + (x1 - x0) / 2 * np.cos(theta)
         y = (y0 + y1) / 2 + (y1 - y0) / 2 * np.sin(theta)
         x0_, y0_ = (x0 + x1) / 2, (y0 + y1) / 2
-        a = canvas.create_line(x, y, x0_, y0_, fill='black', width=2)
+        a = canvas.create_line(x, y, x0_, y0_, fill='purple', width=0)
         b = canvas.coords(a)
         coords.extend([b])
     # print(coords)
     # print(len(coords))
 
+def electrodes():   
+    global elect_rect
+    for index, i in enumerate(coords):
+        x = i[0]
+        y = i[1]
+        if index <= 3 :
+            elect_rect = canvas.create_rectangle(x+7,y+7,x-5,y-5,fill="grey",width=2, tags='line')
+        else:
+            elect_rect = canvas.create_rectangle(x-7,y-7,x+5,y+5,fill="grey",width=2,tags='line')
+
+# top_electrode_X = 203
+# top_electrode_Y = 23
+# def top_electrode(pointX,pointY):
+#     x = pointX
+#     y = pointY
+#     y1 = pointY + 500
+#     canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
+#     for i in range(4):
+#         canvas.create_line(x,y,x+500,y1)
+#         y1 += 50
+
+# # 52,72 TL
+# topleft_electrode_X = 203
+# topleft_electrode_Y = 262
+
+# def topleft_electrode(pointX,pointY):
+#     x = pointX
+#     y = pointY
+#     y1 = pointY + 500
+#     canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
+#     for i in range(4):
+#         canvas.create_line(x,y,x+500,y1)
+#         y1 += 50
 
 
 
-top_electrode_X = 203
-top_electrode_Y = 23
-def top_electrode(pointX,pointY):
-    x = pointX
-    y = pointY
-    y1 = pointY + 500
-    canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
-    for i in range(4):
-        canvas.create_line(x,y,x+500,y1)
-        y1 += 50
-
-# 52,72 TL
-topleft_electrode_X = 203
-topleft_electrode_Y = 262
-
-def topleft_electrode(pointX,pointY):
-    x = pointX
-    y = pointY
-    y1 = pointY + 500
-    canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
-    for i in range(4):
-        canvas.create_line(x,y,x+500,y1)
-        y1 += 50
 
 
+# #  366,89     TR
+# topright_electrode_X = 355
+# topright_electrode_Y = 80
+# tre_ray = 370
+# def topright_electrode(pointX,pointY,ray):
+#     x = pointX
+#     y = pointY
+#     y1 = pointY + 200
+
+#     canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
+#     # canvas.create_line(line_pt, y, x - 500, y +200)
+#     # canvas.create_line(line_pt, y, x - 500, y +250)
+#     # canvas.create_line(line_pt, y, x - 500, y +300)
+#     # canvas.create_line(line_pt, y, x - 500, y +350)
+#     for i in range(4):
+#         canvas.create_line(ray,y,x-500,y1)
+#         y1 += 50
 
 
-
-#  366,89     TR
-topright_electrode_X = 355
-topright_electrode_Y = 80
-tre_ray = 370
-def topright_electrode(pointX,pointY,ray):
-    x = pointX
-    y = pointY
-    y1 = pointY + 200
-
-    canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
-    # canvas.create_line(line_pt, y, x - 500, y +200)
-    # canvas.create_line(line_pt, y, x - 500, y +250)
-    # canvas.create_line(line_pt, y, x - 500, y +300)
-    # canvas.create_line(line_pt, y, x - 500, y +350)
-    for i in range(4):
-        canvas.create_line(ray,y,x-500,y1)
-        y1 += 50
+# #   35,315    BL
+# bottomleft_electrode_X = 73
+# bottomleft_electrode_Y = 357
+# ble_ray = 74
+# def bottomleft_electrode(pointX,pointY,ray):
+#     x = pointX
+#     y = pointY
+#     y1 = pointY - 500
+#     canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
+#     # canvas.create_line(line_pt, y+10, x + 500, y - 500)
+#     # canvas.create_line(line_pt, y+10, x + 500, y - 550)
+#     # canvas.create_line(line_pt, y+10, x + 500, y - 600)
+#     # canvas.create_line(line_pt, y+10, x + 500, y - 650)
+#     for i in range(4):
+#         canvas.create_line(ray,y+10,x+500,y1)
+#         y1 -= 50
 
 
-#   35,315    BL
-bottomleft_electrode_X = 73
-bottomleft_electrode_Y = 357
-ble_ray = 74
-def bottomleft_electrode(pointX,pointY,ray):
-    x = pointX
-    y = pointY
-    y1 = pointY - 500
-    canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
-    # canvas.create_line(line_pt, y+10, x + 500, y - 500)
-    # canvas.create_line(line_pt, y+10, x + 500, y - 550)
-    # canvas.create_line(line_pt, y+10, x + 500, y - 600)
-    # canvas.create_line(line_pt, y+10, x + 500, y - 650)
-    for i in range(4):
-        canvas.create_line(ray,y+10,x+500,y1)
-        y1 -= 50
-
-
-#   348,351    BR
-bottomright_electrode_X = 314
-bottomright_electrode_Y = 357
-bre_ray = 330
-def bottomright_electrode(pointX,pointY,ray):
-    x = pointX
-    y = pointY
-    y1 = pointY - 500
-    canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
-    # canvas.create_line(line_pt, y+13, x - 500, y -500)
-    # canvas.create_line(line_pt, y+13, x - 500, y -550)
-    # canvas.create_line(line_pt, y+13, x - 500, y -600)
-    # canvas.create_line(line_pt, y+13, x - 500, y -650)
-    for i in range(4):
-        canvas.create_line(ray, y+13, x-500,y1)
-        y1 -= 50
+# #   348,351    BR
+# bottomright_electrode_X = 314
+# bottomright_electrode_Y = 357
+# bre_ray = 330
+# def bottomright_electrode(pointX,pointY,ray):
+#     x = pointX
+#     y = pointY
+#     y1 = pointY - 500
+#     canvas.create_rectangle(x,y,x+15,y+12, fill="grey",width=2)
+#     # canvas.create_line(line_pt, y+13, x - 500, y -500)
+#     # canvas.create_line(line_pt, y+13, x - 500, y -550)
+#     # canvas.create_line(line_pt, y+13, x - 500, y -600)
+#     # canvas.create_line(line_pt, y+13, x - 500, y -650)
+#     for i in range(4):
+#         canvas.create_line(ray, y+13, x-500,y1)
+#         y1 -= 50
 
 testline=[(330,370),(-170,-143)]
 def export_csv():
@@ -225,17 +235,18 @@ turn_on.place(x = 512 , y = 212)
 # Dynamic button placement
 dropdown = OptionMenu(window, default_val, *number_electrode, command=electrode_val)
 dropdown.pack()
+dropdown.place(x=512, y = 250 )
 
 #186.97
 # Testing purpose!
 # canvas.create_line([(164.57,200.26),(201.30,237.96)], fill='red', width=2)
 
-top_electrode(top_electrode_X,top_electrode_Y)
+# top_electrode(top_electrode_X,top_electrode_Y)
 
-topleft_electrode(topleft_electrode_X,topleft_electrode_Y)
-topright_electrode(topright_electrode_X,topleft_electrode_Y,tre_ray)
-bottomleft_electrode(bottomleft_electrode_X,bottomleft_electrode_Y,ble_ray)
-bottomright_electrode(bottomright_electrode_X,bottomright_electrode_Y,bre_ray)
+# topleft_electrode(topleft_electrode_X,topleft_electrode_Y)
+# topright_electrode(topright_electrode_X,topleft_electrode_Y,tre_ray)
+# bottomleft_electrode(bottomleft_electrode_X,bottomleft_electrode_Y,ble_ray)
+# bottomright_electrode(bottomright_electrode_X,bottomright_electrode_Y,bre_ray)
 
 
 window.mainloop()
