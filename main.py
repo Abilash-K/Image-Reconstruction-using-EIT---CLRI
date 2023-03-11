@@ -2,13 +2,13 @@ from tkinter import *
 from sympy import Point, Polygon, Line
 import math
 import numpy as np
+import csv
 
 
 window = Tk()
 
 window.geometry("600x400")
 window.title("Polygon Simulation")
-
 canvas = Canvas(width=400, height=400)
 
 canvas.pack()
@@ -31,16 +31,19 @@ canvas.create_polygon(polygon_points, outline='gray',
 
 # Creating a dynamic electrode placement
 number_electrode = ["8","16","32"]
+# getting value from dropdown list
 default_val = StringVar(window)
 default_val.set("Please Select the No: of Electrode") # default value
 def electrode_val(selection):
     global electrode
-    electrode = default_val.get()
-    electrode = int(electrode)
-    creating_electrodes()
-    canvas.delete('line')
+    electrode = default_val.get() # getting electrode val as string
+    electrode = int(electrode) # changing it into int
+    creating_electrodes() 
+    canvas.delete('electrode')
     electrodes()
-
+    canvas.delete('line')
+    
+    
 def creating_electrodes():
     # Divide the oval into sections
     global coords
@@ -51,21 +54,34 @@ def creating_electrodes():
         x = (x0 + x1) / 2 + (x1 - x0) / 2 * np.cos(theta)
         y = (y0 + y1) / 2 + (y1 - y0) / 2 * np.sin(theta)
         x0_, y0_ = (x0 + x1) / 2, (y0 + y1) / 2
-        a = canvas.create_line(x, y, x0_, y0_, fill='purple', width=0)
+        a = canvas.create_line(x, y, x0_, y0_, fill='black', width=0.1, tags='line')
         b = canvas.coords(a)
         coords.extend([b])
     # print(coords)
     # print(len(coords))
-
+    
+#creating electrodes based on the dropdown list
 def electrodes():   
     global elect_rect
     for index, i in enumerate(coords):
         x = i[0]
         y = i[1]
         if index <= 3 :
-            elect_rect = canvas.create_rectangle(x+7,y+7,x-5,y-5,fill="grey",width=2, tags='line')
+            elect_rect = canvas.create_rectangle(x+7,y+7,x-5,y-5,fill="grey",width=2, tags='electrode')
         else:
-            elect_rect = canvas.create_rectangle(x-7,y-7,x+5,y+5,fill="grey",width=2,tags='line')
+            elect_rect = canvas.create_rectangle(x-7,y-7,x+5,y+5,fill="grey",width=2,tags='electrode')
+
+#creating a list        
+def creating_mesh():
+    canvas.delete('mesh')
+    for index, i in enumerate(coords):
+        x = i[0]
+        y = i[1]
+        for i, val in enumerate(reversed(coords)):
+            x2 = val[0]
+            y2 = val[1]
+            canvas.create_line(x,y,x2,y2,tags='mesh')
+    
 
 # top_electrode_X = 203
 # top_electrode_Y = 23
@@ -90,9 +106,6 @@ def electrodes():
 #     for i in range(4):
 #         canvas.create_line(x,y,x+500,y1)
 #         y1 += 50
-
-
-
 
 
 # #  366,89     TR
@@ -151,71 +164,96 @@ def electrodes():
 
 testline=[(330,370),(-170,-143)]
 def export_csv():
+    global distance , intersection_coords
     # creating points using Point()
     p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 = map(Point, polygon_points)
     # creating polygons using Polygon()
     poly1 = Polygon(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13)
 
-    #BOTTOM_RIGHT_ELECTRODE
-    BOTTOM_RIGHT_ELECTRODE = []
-    bre_Y1 = bottomright_electrode_Y - 500
-    BRE_Y0 = bottomright_electrode_Y + 13
-    for i in range(4):
-        p14 , p15 = map(Point,[(bre_ray,BRE_Y0),(-186,bre_Y1)])
-        bre_Y1 -= 50
-        poly2 = Line(p14,p15)
-        isIntersection = poly1.intersection(poly2)
-        point1 = isIntersection[0].evalf()
-        point2= isIntersection[1].evalf()
-        final_distance = math.dist(point1,point2)
-        BOTTOM_RIGHT_ELECTRODE.extend([(point1,point2,final_distance)])
-    print(BOTTOM_RIGHT_ELECTRODE)
+    intersection_coords = []
+    distance = []
+    # Calculating the intersection points for the rays
+    for index, i in enumerate(coords):
+        x = i[0]
+        y = i[1]
+        for i, val in enumerate(reversed(coords)):
+            x2 = val[0]
+            y2 = val[1]
+            if x !=x2 and y != y2:
+                p14 , p15 = map(Point,[(x,y),(x2,y2)])
+                poly2 = Line(p14,p15)
+                isIntersection = poly1.intersection(poly2)
+                if (isIntersection):
+                    point1 = isIntersection[0].evalf()
+                    point2= isIntersection[1].evalf()
+                    final_intersection = math.dist(point1,point2)
+                    print([(point1,point2,final_intersection)])
 
-    #BOTTOM_LEFT_ELECTRODE
-    BOTTOM_LEFT_ELECTRODE = []
-    ble_Y1 = bottomleft_electrode_Y - 500
-    BLE_Y0 = bottomright_electrode_Y + 10
-    for i in range(4):
-        p14 , p15 = map(Point,[(ble_ray,BLE_Y0),(573,ble_Y1)])
-        bre_Y1 -= 50
-        poly2 = Line(p14,p15)
-        isIntersection = poly1.intersection(poly2)
 
-        point1 = isIntersection[0].evalf()
-        point2= isIntersection[1].evalf()
-        final_distance = math.dist(point1,point2)
-        BOTTOM_LEFT_ELECTRODE.extend([(point1,point2,final_distance)])
-    print(BOTTOM_LEFT_ELECTRODE)
+def export():
+    header = ['x1,y1','x2,y2','Distance','voltage']
+    
+    
+    # #BOTTOM_RIGHT_ELECTRODE
+    # BOTTOM_RIGHT_ELECTRODE = []
+    # bre_Y1 = bottomright_electrode_Y - 500
+    # BRE_Y0 = bottomright_electrode_Y + 13
+    # for i in range(4):
+    #     p14 , p15 = map(Point,[(bre_ray,BRE_Y0),(-186,bre_Y1)])
+    #     bre_Y1 -= 50
+    #     poly2 = Line(p14,p15)
+    #     isIntersection = poly1.intersection(poly2)
+    #     point1 = isIntersection[0].evalf()
+    #     point2= isIntersection[1].evalf()
+    #     final_distance = math.dist(point1,point2)
+    #     BOTTOM_RIGHT_ELECTRODE.extend([(point1,point2,final_distance)])
+    # print(BOTTOM_RIGHT_ELECTRODE)
 
-    # TOP_RIGHT_ELECTRODE
-    TOP_RIGHT_ELECTRODE = []
-    TRe_Y1 = topright_electrode_Y + 200
-    for i in range(4):
-        p14, p15 = map(Point, [(tre_ray, topright_electrode_Y), (-145, TRe_Y1)])
-        TRe_Y1 += 50
-        poly2 = Line(p14, p15)
-        isIntersection = poly1.intersection(poly2)
-        if (isIntersection):
-            point1 = isIntersection[0].evalf()
-            point2 = isIntersection[1].evalf()
-            final_distance = math.dist(point1, point2)
-            TOP_RIGHT_ELECTRODE.extend([(point1, point2, final_distance)])
-    print(TOP_RIGHT_ELECTRODE)
+    # #BOTTOM_LEFT_ELECTRODE
+    # BOTTOM_LEFT_ELECTRODE = []
+    # ble_Y1 = bottomleft_electrode_Y - 500
+    # BLE_Y0 = bottomright_electrode_Y + 10
+    # for i in range(4):
+    #     p14 , p15 = map(Point,[(ble_ray,BLE_Y0),(573,ble_Y1)])
+    #     bre_Y1 -= 50
+    #     poly2 = Line(p14,p15)
+    #     isIntersection = poly1.intersection(poly2)
 
-    # TOP_LEFT_ELECTRODE
-    TOP_LEFT_ELECTRODE = []
-    Tle_Y1 = topleft_electrode_Y + 500
-    for i in range(4):
-        p14, p15 = map(Point, [(topleft_electrode_X, topleft_electrode_Y), (529, Tle_Y1)])
-        Tle_Y1 += 50
-        poly2 = Line(p14, p15)
-        isIntersection = poly1.intersection(poly2)
-        if (isIntersection):
-            point1 = isIntersection[0].evalf()
-            point2 = isIntersection[1].evalf()
-            final_distance = math.dist(point1, point2)
-            TOP_LEFT_ELECTRODE.extend([(point1, point2, final_distance)])
-    print(TOP_LEFT_ELECTRODE)
+    #     point1 = isIntersection[0].evalf()
+    #     point2= isIntersection[1].evalf()
+    #     final_distance = math.dist(point1,point2)
+    #     BOTTOM_LEFT_ELECTRODE.extend([(point1,point2,final_distance)])
+    # print(BOTTOM_LEFT_ELECTRODE)
+
+    # # TOP_RIGHT_ELECTRODE
+    # TOP_RIGHT_ELECTRODE = []
+    # TRe_Y1 = topright_electrode_Y + 200
+    # for i in range(4):
+    #     p14, p15 = map(Point, [(tre_ray, topright_electrode_Y), (-145, TRe_Y1)])
+    #     TRe_Y1 += 50
+    #     poly2 = Line(p14, p15)
+    #     isIntersection = poly1.intersection(poly2)
+    #     if (isIntersection):
+    #         point1 = isIntersection[0].evalf()
+    #         point2 = isIntersection[1].evalf()
+    #         final_distance = math.dist(point1, point2)
+    #         TOP_RIGHT_ELECTRODE.extend([(point1, point2, final_distance)])
+    # print(TOP_RIGHT_ELECTRODE)
+
+    # # TOP_LEFT_ELECTRODE
+    # TOP_LEFT_ELECTRODE = []
+    # Tle_Y1 = topleft_electrode_Y + 500
+    # for i in range(4):
+    #     p14, p15 = map(Point, [(topleft_electrode_X, topleft_electrode_Y), (529, Tle_Y1)])
+    #     Tle_Y1 += 50
+    #     poly2 = Line(p14, p15)
+    #     isIntersection = poly1.intersection(poly2)
+    #     if (isIntersection):
+    #         point1 = isIntersection[0].evalf()
+    #         point2 = isIntersection[1].evalf()
+    #         final_distance = math.dist(point1, point2)
+    #         TOP_LEFT_ELECTRODE.extend([(point1, point2, final_distance)])
+    # print(TOP_LEFT_ELECTRODE)
 
     # p14, p15 = map(Point, testline)
     # poly2 = Line(p14, p15)
@@ -235,7 +273,8 @@ turn_on.place(x = 512 , y = 212)
 # Dynamic button placement
 dropdown = OptionMenu(window, default_val, *number_electrode, command=electrode_val)
 dropdown.pack()
-dropdown.place(x=512, y = 250 )
+mesh = Button(window, text="Mesh",command=creating_mesh)
+mesh.place(x = 512 , y = 250)
 
 #186.97
 # Testing purpose!

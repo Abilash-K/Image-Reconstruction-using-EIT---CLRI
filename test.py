@@ -66,8 +66,21 @@ coords = [[330.0, 148.0, 210.0, 148.0], [294.85287003350714, 232.85275745122692,
 
 
 
-for index, i in enumerate(coords):
-        x = i[0]
-        y = i[1]
-        print(x,y)
-        print(index)
+# for index, i in enumerate(coords):
+#         x = i[0]
+#         y = i[1]
+#         print(x,y)
+#         print(index)
+def rectangle_coordinates(coord1, coord2):
+    x1, y1 = coord1
+    x2, y2 = coord2
+    x3, y3 = x1, y2
+    x4, y4 = x2, y1
+    return [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
+
+# Example usage
+coord1 = (330+7, 148+7)
+coord2 = (340-5, 150-5)
+print(rectangle_coordinates(coord1, coord2)) # [(1, 1), (5, 3), (1, 3), (5, 1)]
+
+
