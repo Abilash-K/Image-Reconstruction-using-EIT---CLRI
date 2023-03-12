@@ -38,7 +38,7 @@ def electrode_val(selection):
     global electrode
     electrode = default_val.get() # getting electrode val as string
     electrode = int(electrode) # changing it into int
-    creating_electrodes() 
+    creating_electrodes() #edges - dividing the crircle based on dropdown
     canvas.delete('electrode')
     electrodes()
     canvas.delete('line')
@@ -164,14 +164,14 @@ def creating_mesh():
 
 testline=[(330,370),(-170,-143)]
 def export_csv():
-    global distance , intersection_coords
+    global csv_coordinates
     # creating points using Point()
     p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 = map(Point, polygon_points)
     # creating polygons using Polygon()
     poly1 = Polygon(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13)
 
-    intersection_coords = []
-    distance = []
+
+    csv_coordinates = []
     # Calculating the intersection points for the rays
     for index, i in enumerate(coords):
         x = i[0]
@@ -187,12 +187,40 @@ def export_csv():
                     point1 = isIntersection[0].evalf()
                     point2= isIntersection[1].evalf()
                     final_intersection = math.dist(point1,point2)
-                    print([(point1,point2,final_intersection)])
-
+                    # print([(point1,point2,final_intersection)])
+                    csv_coordinates.extend([[point1,point2,final_intersection]])
+    export()
 
 def export():
     header = ['x1,y1','x2,y2','Distance','voltage']
+        
+    # name of csv file 
+    filename = "coordinates.csv"
+        
+    # writing to csv file 
+    with open(filename, 'w') as csvfile: 
+        # creating a csv writer object 
+        csvwriter = csv.writer(csvfile) 
+            
+        # writing the fields 
+        csvwriter.writerow(header) 
+
+        min_val = csv_coordinates[0][2]
+        max_val = csv_coordinates[0][2]
+        for i,a  in enumerate(csv_coordinates):
+            if a[2] < min_val:
+                min_val = a[2]
+            elif a[2] > max_val:
+                max_val = a[2]
+        for i in range(len(csv_coordinates)):
+            csv_coordinates[i].append(((csv_coordinates[i][2] - min_val) / (max_val - min_val)) * 8 + 2)
+        for i in csv_coordinates:
+            csvwriter.writerow(i)
+
     
+        # # writing the data rows 
+        # for i in csv_coordinates:
+        #     csvwriter.writerow(i)
     
     # #BOTTOM_RIGHT_ELECTRODE
     # BOTTOM_RIGHT_ELECTRODE = []
