@@ -19,8 +19,10 @@ radius = 120
 canvas.create_oval(circle_X-radius,cirxle_Y-radius,circle_X+radius,cirxle_Y+radius, fill="purple")
 canvas.place(relx=0.45, rely=0.65, anchor=CENTER)
 polygon_points = [[224.2356,196.2049],[222.2607,211.2406],[215.6908,226.3429],[203.1994,237.7227],[189.7210,239.4222],[176.7850,231.9500],[168.8122,219.7678],[164.5375,203.4922],[164.7001,187.6920],[168.3534,173.7151],[176.4413,160.6113],[186.5356,153.4606],[195.4196,151.9446]]
-canvas.create_polygon(polygon_points, outline='gray',
-                      fill='gray', width=2)
+canvas.create_polygon(polygon_points, outline='gray',fill='gray', width=2,)
+
+
+
 
 
 # This function gets the coordinates of the mouse pointert and helps to place the electrode
