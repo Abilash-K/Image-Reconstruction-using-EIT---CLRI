@@ -161,3 +161,55 @@
 # plt.colorbar()
 
 # plt.show()
+
+
+
+import numpy as np
+import scipy.fftpack as fftpack
+import scipy.ndimage as ndimage
+import matplotlib.pyplot as plt
+
+# Parameters for the EIT simulation
+num_pixels = 100  # Number of pixels in the image
+num_measurements = 180  # Number of measurements/projections
+
+# Generate an example object (conductivity distribution)
+object_image = np.zeros((num_pixels, num_pixels))
+object_image[40:60, 40:60] = 1.0  # A square-shaped object with higher conductivity
+
+# Generate projection angles
+theta = np.linspace(0, 180, num_measurements, endpoint=False)
+
+# Compute the Fourier series of the object image
+object_fourier_coeffs = fftpack.fftshift(fftpack.fft2(object_image))
+
+# Initialize the reconstructed image
+reconstructed_image = np.zeros((num_pixels, num_pixels))
+
+# Inverse Back Projection (IBP) algorithm
+for i, angle in enumerate(theta):
+    rotated_coeffs = ndimage.rotate(object_fourier_coeffs, angle, reshape=False)
+    rotated_image = fftpack.ifft2(fftpack.ifftshift(rotated_coeffs))
+    reconstructed_image += np.abs(rotated_image)
+
+# Display the results
+plt.figure(figsize=(10, 8))
+
+plt.subplot(221)
+plt.imshow(object_image, cmap='inferno', extent=[0, num_pixels, 0, num_pixels])
+plt.title('True Object')
+plt.colorbar()
+
+plt.subplot(222)
+plt.imshow(np.abs(object_fourier_coeffs), cmap='inferno', extent=[-num_pixels // 2, num_pixels // 2, -num_pixels // 2, num_pixels // 2])
+plt.title('Fourier Coefficients')
+plt.colorbar()
+
+plt.subplot(223)
+plt.imshow(reconstructed_image, cmap='inferno', extent=[0, num_pixels, 0, num_pixels])
+plt.title('Reconstructed Image')
+plt.colorbar()
+
+plt.show()
+
+
